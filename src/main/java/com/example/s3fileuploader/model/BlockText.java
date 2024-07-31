@@ -21,6 +21,6 @@ public class BlockText {
     @Column(name="block_id")
     private String blockId;
 
-    @Column(name="text")
+    @Column(name="text", columnDefinition="TEXT")
     private String text;
 }
