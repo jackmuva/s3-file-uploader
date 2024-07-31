@@ -5,8 +5,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class GenericHttpResponse {
+public class GenericGetResponse {
     private Integer httpStatusCode;
-    private String message;
-
+    private Object response;
 }

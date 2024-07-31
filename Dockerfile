@@ -4,6 +4,6 @@ LABEL maintainer="jackmu@umich.edu"
 
 WORKDIR /app
 
-COPY target/trtlmail-rest.jar /app/trtlmail-rest.jar
+COPY target/s3-file-uploader.jar /app/s3-file-uploader.jar
 
-ENTRYPOINT ["java", "-jar", "trtlmail-rest.jar"]
+ENTRYPOINT ["java", "-jar", "s3-file-uploader.jar"]

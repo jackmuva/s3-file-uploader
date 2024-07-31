@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class S3Service {
@@ -48,7 +49,7 @@ public class S3Service {
 
     public String uploadText(BlockText blockText) {
         File textFile = convertMultiPartToFile(blockText);
-        String filename = generateFileName(blockText);
+        String filename = generateFileName(blockText) + ".txt";
         try{
             PutObjectRequest putObjectRequest = new PutObjectRequest(S3_BUCKET_NAME, filename, textFile)
                     .withCannedAcl(CannedAccessControlList.PublicRead);
@@ -59,6 +60,10 @@ public class S3Service {
             LOGGER.info(e.getMessage());
             return null;
         }
+    }
+
+    public List<BlockText> getAllBlocks(){
+        return blockTextRepository.findAll();
     }
 
     public void saveBlock(BlockText blockText){
