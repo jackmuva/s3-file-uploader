@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
     final Map<String, String> env = System.getenv();
+
+    @Value("${signing-key}")
+    private String privateKeyB64;
     @Value("${app-jwt-expiration-milliseconds}")
     private int jwtExpirationDate;
 
@@ -47,7 +50,7 @@ public class JwtTokenProvider {
 
     private PrivateKey privateKey(){
         try{
-            String privateKeyB64 = Files.lines(Paths.get("src/main/resources/paragon_signing_key.key")).collect(Collectors.joining());
+            LOGGER.info(privateKeyB64);
             byte[] privateKeyDecoded = Base64.getDecoder().decode(privateKeyB64);
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(privateKeyDecoded);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");

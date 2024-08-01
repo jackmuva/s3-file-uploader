@@ -15,7 +15,7 @@ echo "Syncing env file in S3"
 aws s3 --region 'us-east-1' sync ./env 's3://rag-backend-env/'
 
 echo "updating AWS ECS service..."
-aws ecs update-service --cluster rag-cluster --service rag-backend-service --force-new-deployment
+aws ecs update-service --cluster rag-cluster --service rag-backend-serv --force-new-deployment
 
 echo "Post-Build steps:"
 echo "pushing image to AWS ECR"
