@@ -54,7 +54,10 @@ public class HttpSecurityConfig {
                 .cors().configurationSource(corsConfigurationSource()).and().csrf().disable().authorizeHttpRequests((authorize) ->
                         authorize.antMatchers(HttpMethod.GET, "/api/**").permitAll()
                                 .antMatchers(HttpMethod.POST, "/api/**").permitAll()
+                                .antMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()
+                ).exceptionHandling( exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 ).sessionManagement( session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
