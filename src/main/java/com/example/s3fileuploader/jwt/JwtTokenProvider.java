@@ -7,15 +7,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
     final Map<String, String> env = System.getenv();
-    private String jwtSecret = env.get("jwt-secret");
     @Value("${app-jwt-expiration-milliseconds}")
     private int jwtExpirationDate;
 
@@ -33,21 +39,28 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(key())
+                .signWith(SignatureAlgorithm.RS256, privateKey())
                 .compact();
 
         return jwtToken;
     }
 
-    private Key key(){
-        return Keys.hmacShaKeyFor(
-                Decoders.BASE64.decode(jwtSecret)
-        );
+    private PrivateKey privateKey(){
+        try{
+            String privateKeyB64 = Files.lines(Paths.get("src/main/resources/paragon_signing_key.key")).collect(Collectors.joining());
+            byte[] privateKeyDecoded = Base64.getDecoder().decode(privateKeyB64);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(privateKeyDecoded);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePrivate(spec);
+        } catch (Exception e){
+            LOGGER.info(e.getMessage());
+        }
+        return null;
     }
 
     public String getUsername(String token){
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key())
+                .setSigningKey(privateKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -58,7 +71,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token){
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key())
+                    .setSigningKey(privateKey())
                     .build()
                     .parse(token);
             return true;
